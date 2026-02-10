@@ -1,0 +1,15 @@
+event_date,event_name,category,description
+2013-07-01,Libya export disruptions,Supply disruption,Protests and port blockades reduce Libyan crude exports and tighten Mediterranean supply.
+2014-06-10,Iraq conflict escalation,Geopolitical conflict,ISIS advances in northern Iraq raise supply risk premiums.
+2014-11-27,OPEC maintains output,OPEC policy,OPEC opts against production cuts, accelerating the 2014 price decline.
+2015-07-14,Iran nuclear deal signed,Sanctions,JCPOA agreement signals future supply return to markets.
+2016-01-16,Iran sanctions lifted,Sanctions,Implementation day allows Iran to ramp up exports.
+2016-11-30,OPEC+ production cut,OPEC policy,OPEC and non-OPEC agree to coordinated cuts to stabilize prices.
+2018-05-08,US exits JCPOA,Sanctions,US announces withdrawal from Iran deal and reimposes sanctions.
+2018-12-07,OPEC+ agrees new cuts,OPEC policy,Coalition agrees to reduce output by 1.2 mbpd starting 2019.
+2019-09-14,Abqaiq attack,Supply disruption,Attacks on Saudi oil facilities temporarily cut output.
+2020-03-11,WHO declares COVID-19 pandemic,Demand shock,Global demand collapses as travel and industry slow.
+2020-04-12,OPEC+ historic cuts,OPEC policy,Producers agree to record production cuts to address demand collapse.
+2021-03-23,Suez Canal blockage,Logistics disruption,Grounded vessel blocks canal and delays oil shipments.
+2022-02-24,Russia invades Ukraine,Geopolitical conflict,War triggers supply risk and sanctions concerns.
+2022-05-31,EU agrees Russian oil embargo,Sanctions,EU agrees phased ban on most Russian oil imports.
