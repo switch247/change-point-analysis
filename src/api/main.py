@@ -1,53 +1,143 @@
-import pandas as pd
-import mlflow.sklearn
-import joblib
-from fastapi import FastAPI, HTTPException, Query
-from sqlalchemy import text
-from .database import engine
-from .schemas import TopProduct, ChannelActivity, MessageSearchResult, VisualContentStats
-from typing import List
-from src.api.pydantic_models import TransactionInput, PredictionOutput
-import sys
+from __future__ import annotations
+
 from pathlib import Path
+from typing import Any, Dict, Optional
 
-# Add project root to path to allow imports from src if needed
-project_root = Path(__file__).resolve().parents[2]
-sys.path.append(str(project_root))
+import pandas as pd
+import numpy as np
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 
-app = FastAPI(title="Test")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DATA_PATH = PROJECT_ROOT / "data" / "raw" / "BrentOilPrices.csv"
+EVENTS_PATH = PROJECT_ROOT / "data" / "processed" / "events.csv"
 
-# Set tracking URI - assuming mlruns is in the root of the app
-# In Docker, we'll set WORKDIR to /app and copy mlruns there
-mlflow.set_tracking_uri("file:./mlruns")
-
-model_name = "test"
-model_version = "1"
-model_uri = f"models:/{model_name}/{model_version}"
-
-model = None
+app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 
-@app.on_event("startup")
-def load_model():
-    global model
-    try:
-        print(f"Attempting to load model from {model_uri}...")
-        model = mlflow.sklearn.load_model(model_uri)
-        print("Model loaded successfully from MLflow.")
-    except Exception as e:
-        print(f"Failed to load from MLflow: {e}")
-        fallback_path = project_root / "outputs" / "models" / "model.pkl"
-        print(f"Attempting fallback load from {fallback_path}...")
-        try:
-            model = joblib.load(fallback_path)
-            print("Model loaded successfully from fallback path.")
-        except Exception as e2:
-            print(f"Error loading model from fallback: {e2}")
-            # In production, we might want to fail startup, but for dev log it
-            pass
+def _load_prices() -> pd.DataFrame:
+    df = pd.read_csv(DATA_PATH)
+    df["Date"] = pd.to_datetime(df["Date"], format="mixed", dayfirst=True, errors="coerce")
+    df["Price"] = pd.to_numeric(df["Price"], errors="coerce")
+    df = df.dropna(subset=["Date", "Price"]).sort_values("Date").reset_index(drop=True)
+    return df
 
 
-@app.get("/")
-def read_root():
-    return {"message": "Credit Risk Fraud Detection API is running"}
+def _load_events() -> pd.DataFrame:
+    df = pd.read_csv(EVENTS_PATH)
+    df["event_date"] = pd.to_datetime(df["event_date"], errors="coerce")
+    return df
 
+
+def _filter_date_range(
+    df: pd.DataFrame,
+    date_col: str,
+    start: Optional[str],
+    end: Optional[str],
+) -> pd.DataFrame:
+    if start:
+        start_dt = pd.to_datetime(start, errors="coerce")
+        if pd.notna(start_dt):
+            df = df[df[date_col] >= start_dt]
+    if end:
+        end_dt = pd.to_datetime(end, errors="coerce")
+        if pd.notna(end_dt):
+            df = df[df[date_col] <= end_dt]
+    return df
+
+
+def _estimate_change_point(df: pd.DataFrame, window: int = 30) -> Dict[str, Any]:
+    df = df.copy()
+    df["Price"] = pd.to_numeric(df["Price"], errors="coerce")
+    df = df.dropna(subset=["Price"]).reset_index(drop=True)
+    df["log_price"] = np.log(df["Price"].where(df["Price"] > 0))
+    df["log_return"] = df["log_price"].diff()
+    df_lr = df.dropna(subset=["log_return"]).reset_index(drop=True)
+
+    if len(df_lr) < window * 2:
+        return {
+            "status": "insufficient_data",
+            "window": window,
+        }
+
+    diffs = []
+    for idx in range(window, len(df_lr) - window):
+        before = df_lr["log_return"].iloc[idx - window : idx].mean()
+        after = df_lr["log_return"].iloc[idx : idx + window].mean()
+        diffs.append((idx, abs(after - before), before, after))
+
+    best_idx, best_diff, mu_before, mu_after = max(diffs, key=lambda x: x[1])
+    cp_date = df_lr.loc[best_idx, "Date"]
+    return {
+        "status": "ok",
+        "change_point_date": cp_date.strftime("%Y-%m-%d"),
+        "window": window,
+        "mean_before": float(mu_before),
+        "mean_after": float(mu_after),
+        "mean_shift": float(mu_after - mu_before),
+    }
+
+
+@app.get("/api/health")
+def health() -> Dict[str, str]:
+    return {"status": "ok", "service": "change-point-api"}
+
+
+@app.get("/api/prices")
+def prices() -> Any:
+    df = _load_prices()
+    start = request.args.get("start")
+    end = request.args.get("end")
+    df = _filter_date_range(df, "Date", start, end)
+    payload = df.rename(columns={"Date": "date", "Price": "price"})
+    return jsonify(payload.to_dict(orient="records"))
+
+
+@app.get("/api/log-returns")
+def log_returns() -> Any:
+    df = _load_prices()
+    df["log_price"] = np.log(df["Price"].where(df["Price"] > 0))
+    df["log_return"] = df["log_price"].diff()
+    df = df.dropna(subset=["log_return"]).reset_index(drop=True)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    df = _filter_date_range(df, "Date", start, end)
+    payload = df[["Date", "log_return"]].rename(columns={"Date": "date"})
+    return jsonify(payload.to_dict(orient="records"))
+
+
+@app.get("/api/events")
+def events() -> Any:
+    df = _load_events()
+    start = request.args.get("start")
+    end = request.args.get("end")
+    df = _filter_date_range(df, "event_date", start, end)
+    payload = df.rename(columns={"event_date": "date"})
+    payload["date"] = payload["date"].dt.strftime("%Y-%m-%d")
+    return jsonify(payload.to_dict(orient="records"))
+
+
+@app.get("/api/change-point")
+def change_point() -> Any:
+    df = _load_prices()
+    window = request.args.get("window", default=30, type=int)
+    result = _estimate_change_point(df, window=window)
+    return jsonify(result)
+
+
+@app.get("/api/summary")
+def summary() -> Any:
+    df = _load_prices()
+    events_df = _load_events()
+    result = {
+        "start_date": df["Date"].min().strftime("%Y-%m-%d"),
+        "end_date": df["Date"].max().strftime("%Y-%m-%d"),
+        "total_records": int(len(df)),
+        "event_count": int(len(events_df)),
+    }
+    return jsonify(result)
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=4000, debug=True)
