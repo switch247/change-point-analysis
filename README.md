@@ -56,8 +56,16 @@ Week 11 challenge repository for detecting structural breaks in Brent oil prices
    Access at http://localhost:8000
 
 ## Task 3 Dashboard
+### Run Backend Server
 - Backend API (Flask): `python -m src.api.change_point_api`
+
+### Run Frontend
 - Frontend: see [frontend/README.md](frontend/README.md)
+
+### Dashboard Usage
+- Filters: date range and change-point window size.
+- Interactions: click an event to highlight its date on the price chart.
+- Responsive layout: charts and tables scale across desktop and mobile widths.
 
 ### Dashboard Screenshots
 ![Dashboard overview](docs/image.png)
