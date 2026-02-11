@@ -1,0 +1,268 @@
+:root {
+  --ink: #0f172a;
+  --muted: #475569;
+  --accent: #ff8a5b;
+  --accent-soft: #ffd7c2;
+  --teal: #0ea5a8;
+  --violet: #6d28d9;
+  --canvas: #f8f4ef;
+  --panel: #ffffff;
+  --shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at top, #fff2e8 0%, #f8f4ef 50%, #eef2ff 100%);
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.hero h1 {
+  font-family: "Source Serif 4", serif;
+  font-size: clamp(2rem, 3vw, 3rem);
+  margin: 8px 0 12px;
+}
+
+.subtitle {
+  color: var(--muted);
+  max-width: 460px;
+}
+
+.summary {
+  display: grid;
+  gap: 16px;
+  background: var(--panel);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.summary span {
+  color: var(--muted);
+  font-size: 13px;
+  display: block;
+}
+
+.summary strong {
+  font-size: 18px;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  background: var(--panel);
+  padding: 16px 20px;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+}
+
+.controls label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.controls input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  font-family: inherit;
+}
+
+.error {
+  color: #b91c1c;
+  font-weight: 600;
+  align-self: end;
+}
+
+.grid {
+  display: grid;
+  gap: 24px;
+}
+
+.card {
+  background: var(--panel);
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 16px;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.card-header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.chart {
+  width: 100%;
+  min-height: 320px;
+}
+
+.events-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.events-strip button {
+  border: 1px solid transparent;
+  background: #fff5ef;
+  border-radius: 14px;
+  padding: 12px;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.2s ease, border 0.2s ease;
+}
+
+.events-strip button span {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.events-strip button strong {
+  display: block;
+  margin-top: 4px;
+}
+
+.events-strip button:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.events-strip button.active {
+  border-color: var(--violet);
+  background: #f3e8ff;
+}
+
+.insight {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.insight h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.insight-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.insight-grid span {
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
+}
+
+.insight-grid strong {
+  font-size: 16px;
+}
+
+.events-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.events-table th,
+.events-table td {
+  text-align: left;
+  padding: 12px 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.events-table th {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.table {
+  overflow-x: auto;
+}
+
+.footer {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--muted);
+}
+
+.legend {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.legend .dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.legend .price {
+  background: var(--accent);
+}
+
+.legend .return {
+  background: var(--teal);
+}
+
+.legend .change {
+  background: var(--violet);
+}
+
+@media (max-width: 720px) {
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+}
