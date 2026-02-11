@@ -30,3 +30,4 @@ walkthrough.md*
 /*.session
 
 *csv
+!events.csv
