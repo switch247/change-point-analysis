@@ -50,6 +50,16 @@ Week 11 challenge repository for detecting structural breaks in Brent oil prices
    ```
    Access at http://localhost:8000
 
+## Task 3 Dashboard
+- Backend API (Flask): `python -m src.api.change_point_api`
+- Frontend: see [frontend/README.md](frontend/README.md)
+
+### Dashboard Screenshots
+![Dashboard overview](docs/image.png)
+![Price trajectory](docs/image1.png)
+![Volatility pulse](docs/image2.png)
+![Event correlations](docs/image3.png)
+
 ## Workflow and Best Practices
 - Capture task notes and event research logs in `experiments/`.
 - Keep exploratory work in notebooks and move reusable logic into `src/`.

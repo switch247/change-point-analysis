@@ -1,6 +1,6 @@
 name: Unit Tests  # Name of the workflow
 
-on: [push, pull_request]   # 👈 When this workflow is triggered
+on: [pull_request]   # 👈 When this workflow is triggered
 
 jobs:
   unit-tests:                    # A job is a group of steps
