@@ -12,6 +12,11 @@ Week 11 challenge repository for detecting structural breaks in Brent oil prices
 - **Task 2: Change Point Modeling** - EDA, stationarity checks, Bayesian change point model in PyMC, and quantified impact statements.
 - **Task 3: Dashboard** - Interactive UI to explore prices, change points, and event correlations (backend API + frontend UI).
 
+## Task 1 Artifacts
+- Workflow + assumptions: [notebooks/task1_foundation.md](notebooks/task1_foundation.md)
+- Structured events dataset: [data/processed/events.csv](data/processed/events.csv)
+- EDA notebook (loading, stationarity, volatility, visuals): [notebooks/01_eda.ipynb](notebooks/01_eda.ipynb)
+
 ## Repository Layout
 ```
 <project root>
